@@ -50,44 +50,93 @@ start outputs\maps\rescue_map.html   # Windows 直接打开
 
 ## 目录结构
 
+以下为 **git 跟踪的真实文件树**(共 54 个文件)。`📁` 标注目录,`📦` 标注产物。
+
 ```
 mediaSearch/
-├── README.md                      # 本文件
-├── requirements.txt               # 依赖清单
-├── 社交媒体求救信息自动提取与定位.md  # 任务书
+├── .gitignore                         # Git 忽略规则 (排除 .venv/models/checkpoints 等)
+├── .gitattributes                     # 换行符/二进制规则
+├── README.md                          # 本文件
+├── requirements.txt                   # 依赖清单 (带版本号)
+├── 社交媒体求救信息自动提取与定位.md    # 课程任务书
+├── 项目汇总报告.md                     # 项目级总结报告 (~6800 字)
 │
-├── data/
-│   ├── raw/distress_messages_raw.jsonl    # ≥100 条原始求救文本 (实际 288 条)
+├── data/                              # 📁 数据包 (任务书要求)
+│   ├── raw/
+│   │   └── distress_messages_raw.jsonl        # 原始数据 (288 条, 68 种子 + 220 模板)
 │   ├── processed/
-│   │   ├── train.jsonl / dev.jsonl / test.jsonl   # BIO 标注,7:1:2 划分
-│   │   └── structured_results.csv          # 结构化结果表 (推理后生成)
-│   └── geo/china_geo_dict.json             # 本地地名→经纬度字典 (212 条)
+│   │   ├── train.jsonl / dev.jsonl / test.jsonl  # BIO 标注 (201/28/59, 7:1:2)
+│   │   └── structured_results.csv             # 📦 结构化结果表 (推理导出)
+│   └── geo/
+│       └── china_geo_dict.json                # 本地地名→经纬度字典 (212 条)
 │
-├── src/
-│   ├── config.py                  # 集中配置: 路径、标签、超参
+├── src/                               # 📁 源码 (17 个 Python 模块)
+│   ├── __init__.py
+│   ├── config.py                      # 集中配置: 路径、标签、超参
 │   ├── data/
-│   │   ├── build_dataset.py       # 生成原始数据集 (68 手写种子 + 220 模板扩增)
-│   │   ├── annotate.py            # 结构化标注 → BIO 标签 + 划分 train/dev/test
-│   │   ├── preprocess.py          # 文本清洗 (URL/@/#/emoji/繁简)
-│   │   └── dataset.py             # PyTorch Dataset + Collate
+│   │   ├── __init__.py
+│   │   ├── build_dataset.py           # 生成原始数据集
+│   │   ├── annotate.py                # 结构化标注 → BIO + 划分 train/dev/test
+│   │   ├── preprocess.py              # 文本清洗 (URL/@/#/emoji/繁简)
+│   │   └── dataset.py                 # PyTorch Dataset + Collate
 │   ├── models/
-│   │   ├── bert_ner.py            # BERT + Linear (+ CRF) 模型
-│   │   └── crf.py                 # 纯 PyTorch 实现的 CRF + Viterbi
-│   ├── baselines/rule_based.py    # 规则/词典基线
+│   │   ├── __init__.py
+│   │   ├── bert_ner.py                # BERT + Linear (+ CRF) 模型
+│   │   └── crf.py                     # 纯 PyTorch CRF + Viterbi 解码
+│   ├── baselines/
+│   │   ├── __init__.py
+│   │   └── rule_based.py              # 规则/词典基线 (对照实验)
 │   ├── geo/
-│   │   ├── build_geo_dict.py      # 生成地名库
-│   │   ├── local_db.py            # 本地最长匹配
-│   │   ├── online_api.py          # 高德/百度 API
-│   │   └── geocoder.py            # 统一接口: 本地优先 → 在线回退
-│   ├── train.py                   # 训练主脚本
-│   ├── evaluate.py                # 评估: P/R/F1 + bad case
-│   ├── infer.py                   # 推理: 文本 → 实体 → 地理编码 → CSV
-│   └── visualize.py               # 求救点分布图 (folium)
+│   │   ├── __init__.py
+│   │   ├── build_geo_dict.py          # 生成地名库
+│   │   ├── local_db.py                # 本地最长匹配
+│   │   ├── online_api.py              # 高德/百度 API (带 AK 占位)
+│   │   └── geocoder.py                # 统一接口: 本地优先 → 在线回退
+│   ├── train.py                       # 训练 (含 TensorBoard + 日志 + 曲线图)
+│   ├── evaluate.py                    # 评估 (P/R/F1 + bad case)
+│   ├── infer.py                       # 推理 (文本→实体→地理编码→CSV)
+│   └── visualize.py                   # 求救点分布仪表盘 (手写 HTML + 高德底图)
 │
-├── notebooks/demo.ipynb           # 演示 notebook (录制视频用)
-├── outputs/                       # 运行产物 (训练后自动生成)
-└── scripts/run_all.bat|sh         # 一键运行全流程
+├── notebooks/
+│   └── demo.ipynb                     # 演示 notebook (录视频用)
+│
+├── outputs/                           # 📁 运行产物
+│   ├── maps/                          # 📁 求救点分布图
+│   │   ├── rescue_map.html            # 📦 新版仪表盘 (136KB, 高德底图, 本地 JS/CSS)
+│   │   ├── rescue_map_old.html        # 📦 旧版 folium (600KB, 含 CDN, 归档对比用)
+│   │   └── static/                    # 离线静态资源 (278KB)
+│   │       ├── jquery/jquery-3.7.1.min.js
+│   │       ├── leaflet/{leaflet.js, leaflet.css}
+│   │       └── markercluster/{*.js, *.css}
+│   └── reports/                       # 📁 训练/评估报告
+│       ├── train_log.txt              # 完整训练日志
+│       ├── train_history.json         # 训练历史 (JSON, 画图用)
+│       ├── training_curve.png         # 📦 静态训练曲线图 (放 PPT)
+│       ├── metrics.json               # BERT vs 规则基线对比指标
+│       └── badcase.txt                # 17 条预测错误样本
+│
+├── scripts/                           # 📁 辅助脚本
+│   ├── download_model.py              # 一键下载 bert-base-chinese (ModelScope)
+│   ├── download_static.py             # 下载地图静态资源到 outputs/maps/static/
+│   ├── regen_old_map.py               # 还原旧版 folium 地图
+│   ├── run_all.bat / run_all.sh       # 一键运行全流程 (Win/Linux)
+│   └── start_tensorboard.bat / .sh    # 启动 TensorBoard (端口 6006)
+│
+├── docs/                              # 📁 文档
+│   ├── 技术方案.md                     # ~3500 字技术方案
+│   ├── 数据字段说明.md                 # 字段定义 + 数据来源
+│   └── PPT大纲.md                      # 12 页汇报 PPT 大纲
+│
+└── (gitignore 排除, 不在仓库内但可重建)
+    ├── .venv/                 # 虚拟环境 (3.6GB) → pip install -r requirements.txt 重建
+    ├── models/                # BERT 权重 (1.6GB) → scripts/download_model.py 重下
+    ├── outputs/checkpoints/   # 训练后权重 (400MB) → python -m src.train 重新训练
+    ├── outputs/reports/tensorboard/  # TB 日志 → 训练自动生成
+    ├── .idea/ .zcode/         # IDE/工具配置
+    └── __pycache__/           # Python 缓存
 ```
+
+**说明**:`📁` 目录、`📦` 产物(由代码生成但已纳入版本控制,方便直接查看)。仓库总大小约 **0.5 MB**,大文件全部由 `.gitignore` 排除,可通过上述命令重新构建。
 
 ---
 
