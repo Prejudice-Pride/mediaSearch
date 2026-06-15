@@ -1,0 +1,63 @@
+# ==========================================================
+# 社交媒体求救信息自动提取与定位 - .gitignore
+# ==========================================================
+
+# ---- 大文件 / 模型权重 (绝不提交) ----
+# BERT 预训练权重 (~1.6 GB), 用 scripts/download_model.py 重新下载
+models/
+# 训练后的模型 checkpoint (~400 MB), 由训练生成
+outputs/checkpoints/
+
+# ---- Python 虚拟环境 ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Python 缓存 / 编译 ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- IDE / 编辑器 ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ---- ZCode / 工具配置 ----
+.zcode/
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+*.ipynb_metadata
+
+# ---- 日志 / 临时 ----
+*.log
+*.tmp
+*.bak
+*.cache
+_inspect_*.py
+_verify_*.py
+
+# ---- 实验产物 (体积大, 由训练/推理生成) ----
+# TensorBoard 日志 (可由训练重新生成)
+outputs/reports/tensorboard/
+# 训练后的大权重 (已在上面排除整个 checkpoints/)
+# 注意: outputs/reports/ 下的 metrics/train_log 等小文件 *保留* (论文/汇报需要)
+# 注意: outputs/maps/ 下的 rescue_map.html + static/ *保留* (核心交付物)
