@@ -4,7 +4,7 @@
 
 # ---- 大文件 / 模型权重 (绝不提交) ----
 # BERT 预训练权重 (~1.6 GB), 用 scripts/download_model.py 重新下载
-models/
+/models/
 # 训练后的模型 checkpoint (~400 MB), 由训练生成
 outputs/checkpoints/
 
